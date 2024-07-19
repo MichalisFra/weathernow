@@ -32,6 +32,7 @@ h1 {
 
 .bot-gap {
     margin-bottom: 20px;
+    min-width: 300px;
 }
 
 .weather {
@@ -138,3 +139,7 @@ input[type=text].search:focus {
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
+.search-form {
+   
+    min-width: 300px;
+}

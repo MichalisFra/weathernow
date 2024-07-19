@@ -1,5 +1,11 @@
+
+* {
+    box-sizing: border-box;
+}
+
 body {
-	
+	height: 100vh;
+    width: 100vw;
     background-size: cover;
     background-repeat: no-repeat;
     margin: 0;
@@ -26,7 +32,18 @@ h1 {
 
 .bot-gap {
     margin-bottom: 20px;
+    min-width: 300px;
 }
+
+
+.search-form {
+    position: relative;
+ 
+ }
+
+ #waiting {
+    position: absolute;
+ }
 
 .weather {
     color: #fff;
