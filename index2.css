@@ -1,0 +1,133 @@
+body {
+	
+    background-size: cover;
+    background-repeat: no-repeat;
+    margin: 0;
+
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    font-style: normal;
+}
+
+h1 {
+ 
+    font-family: "Roboto", sans-serif;
+    font-weight: 200;
+    font-style: normal;
+    color: #fff;
+	/* text-shadow: 2px 2px 2px rgba(0, 0, 0, 10); */
+
+    text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
+
+}
+.container {
+    text-align: center;
+}
+
+.bot-gap {
+    margin-bottom: 20px;
+}
+
+.weather {
+    color: #fff;
+    font-size: 28px;
+    /* text-shadow: 1px 3px 3px black; */
+    text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
+}
+
+
+
+.weather {
+    display: inline-flex;
+    flex-wrap: wrap;
+}
+
+.weather-info {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 15px;
+    width: 300px;
+	border: 1px solid rgb(148, 148, 148);
+}
+
+.weather-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Center child elements */
+}
+
+.text-left {
+    text-align: left;
+}
+
+.location-name {
+    color: #fff;
+    font-size: 28px;
+
+    margin-bottom: 15px;
+}
+
+.temperature, .sky, .humidity {
+    
+    text-align: center; 
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.valign-middle {
+    vertical-align: middle;
+}
+
+.valign-bottom {
+    vertical-align: bottom;
+}
+
+#weatherIcon {
+    font-size: 48px; /* Adjust the size as needed */
+    margin-bottom: 15px;
+    
+}
+
+input[type=text].search {
+    width: 100%;
+    max-width: 290px;
+    height: 45px;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 25px;
+    border: 1px solid #ddd;
+    padding-left: 50px; /* Ensure there's enough space for the icon */
+
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    font-size: 16px;
+    color: #333;
+    background-image: url('./img/search.png');
+    background-position: 15px center; /* Adjusted position for better visibility */
+    background-repeat: no-repeat;
+    background-size: 20px 20px; /* Adjusted size to fit within the input */
+}
+
+input[type=text].search::placeholder {
+    color: #888;
+}
+
+input[type=text].search:focus {
+    background: #fff;
+    background-image: url('./img/search.png');
+    background-position: 15px center; 
+    background-repeat: no-repeat;
+    background-size: 20px 20px;
+    outline: none;
+    
+    
+    border-color: #007BFF;
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+}

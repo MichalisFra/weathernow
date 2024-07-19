@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>w e a t h e r  n o w</title>
+    <link rel="stylesheet" href="./index2.css">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+        </style>
+
+    <script type="module" src="./weather.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div class="bot-gap">
+            <h1>w e a t h e r  n o w</h1>
+        </div>
+        <div class="bot-gap">
+            <form>
+                <input id="searchInput" type="text" class="search rounded" placeholder="Enter location" autofocus/>
+                <img id="waiting" class="hidden valign-middle" src="./img/waiting.gif" />
+            </form>
+
+            <div class="weather hidden">
+                <div class="weather-info">
+                    <div class="block-text location-name">
+                        <span id="locationName">Location Name</span>
+                        <span id="currentTime" class="current-time">Current Time</span>
+                    </div>
+                    <div class="weather-details">
+                        <i id="weatherIcon" class="fas"></i>
+
+                        
+                        <div id="temperature" class="temperature">Temperature</div>
+                        <div id="sky" class="sky">Sky</div>
+                        
+                        <div id="humidity" class="humidity">Humidity </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="not-found hidden">
+            <span>Δε βρέθηκε πόλη σύμφωνα με τα κριτήρια αναζήτησης.</span>
+        </div>
+        <div class="error hidden">
+            <span>Παρουσιάστηκε σφάλμα κατά την κλήση της υπηρεσίας.</span>
+        </div>
+    </div>
+</body>
+</html>
