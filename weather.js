@@ -38,6 +38,12 @@ $(function() {
             getWeather(this.value.trim())
         }, 1500)
     })
+
+    $('#searchInput').on('keydown', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault(); // Prevent default action, e.g., form submission
+        }
+    });
 })
 updateBackgroundImage(); // Update the background image based on the current time
 
