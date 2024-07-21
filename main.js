@@ -33,7 +33,6 @@ const backgroundImageMapping = {
 
 $(function() {
     var debounceTimeout = null
-
     $('#searchInput').on('input', function() {
         clearTimeout(debounceTimeout)
         debounceTimeout = setTimeout(() => {
@@ -46,16 +45,25 @@ $(function() {
             event.preventDefault(); // Prevent default action, e.g., form submission
         }
     });
+
+    updateBackgroundImage();
 })
-updateBackgroundImage(); // Update the background image based on the current time
+
+ 
 
 
-function getWeather(location) {
+async function getWeather(location) {
     if (!location) return
 
-    onBeforeSend()
-    fetchWeatherFromApi(location)
-    updateBackgroundImage(); 
+    try {
+        onBeforeSend()
+        const weather = await fetchWeatherFromApi(location)
+        handleResults(weather)
+    } catch(error) {
+        console.log(error)
+        onApiError()
+    }
+    
 }
 
 function updateBackgroundImage() {
@@ -65,9 +73,9 @@ function updateBackgroundImage() {
     let backgroundImageUrl;
     if (hours >= 6 && hours < 10) {
         backgroundImageUrl = backgroundImageMapping.morning;
-    } else if (hours >= 10 && hours < 14) {
+    } else if (hours >= 10 && hours < 16) {
         backgroundImageUrl = backgroundImageMapping.midday;
-    } else if (hours >= 14 && hours < 18) {
+    } else if (hours >= 16 && hours < 20) {
         backgroundImageUrl = backgroundImageMapping.afternoon;
     } else {
         backgroundImageUrl = backgroundImageMapping.night;
@@ -78,18 +86,40 @@ function updateBackgroundImage() {
 
 
 
+async function fetchWeatherFromApi(location) {
+    let apiKey = '773d87a5a09864b76e24306a4399635d'
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`
 
-function fetchWeatherFromApi(location) {
-      let apiKey = '773d87a5a09864b76e24306a4399635d'
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`).then(response => {
-        if (!response.ok) {
-            return Promise.reject(new Error(`Response status: ${response.status}`))
-        }
-        return response.json()
-    })
-    .then(data => handleResults(data))
-    .catch(error => console.log(error.message))
+    return await getXHRPromise(url)
 }
+
+
+function getXHRPromise(url) {
+    return new Promise((resolve, reject) => {
+        let ajaxRequest = new XMLHttpRequest()
+        ajaxRequest.open('GET', url, true)
+
+
+        ajaxRequest.timeout = 5000
+        ajaxRequest.ontimeout = () => onApiError()
+
+        ajaxRequest.onreadystatechange = function() {
+            if (ajaxRequest.readyState === 4) {
+                if (ajaxRequest.status === 200) {
+                    const weather = JSON.parse(ajaxRequest.responseText)
+                    resolve(weather)
+                }
+                else {
+                    reject (new Error ('Failed to load the data'))
+                }
+            }
+        }
+        ajaxRequest.send()
+    })
+}
+
+
+
 
 function handleResults(response) {
     if (response.cod === 200) {
