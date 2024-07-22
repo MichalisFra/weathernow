@@ -1,5 +1,3 @@
-
-
 const weatherIconMapping = {
     "01d": "fa-sun",
     "01n": "fa-moon",
@@ -21,7 +19,6 @@ const weatherIconMapping = {
     "50n": "fa-smog"
 };
 
-
 const backgroundImageMapping = {
     morning: "https://img.freepik.com/free-photo/twilight-cloud_1203-6585.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1721347200&semt=ais_user",
     midday: "https://i.pinimg.com/736x/95/58/4e/95584e7488697d4d6a7567f4b86e1027.jpg",
@@ -29,47 +26,47 @@ const backgroundImageMapping = {
     night: "https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdXB3azYxOTE1NzQ2LXdpa2ltZWRpYS1pbWFnZS1rb3dlOGVqMy5qcGc.jpg"
 };
 
-
-
 $(function() {
-    var debounceTimeout = null
+    var debounceTimeout = null;
     $('#searchInput').on('input', function() {
-        clearTimeout(debounceTimeout)
+        clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => {
-            getWeather(this.value.trim())
-        }, 1500)
-    })
+            getWeather(this.value.trim());
+        }, 1500);
+    });
 
     $('#searchInput').on('keydown', function(event) {
         if (event.key === 'Enter') {
             event.preventDefault(); // Prevent default action, e.g., form submission
+            clearTimeout(debounceTimeout);
+            getWeather(this.value.trim());
         }
     });
 
     updateBackgroundImage();
-})
-
- 
-
+});
 
 async function getWeather(location) {
-    if (!location) return
+    if (!location) return;
 
     try {
         onBeforeSend()
         const weather = await fetchWeatherFromApi(location)
         handleResults(weather)
-    } catch(error) {
+    } catch (error) {
         console.log(error)
-        onApiError()
+        if (error.status === 404) {
+            showNotFound()
+        } else {
+            onApiError()
+        }
     }
-    
 }
 
 function updateBackgroundImage() {
     const now = new Date();
     const hours = now.getHours();
-    
+
     let backgroundImageUrl;
     if (hours >= 6 && hours < 10) {
         backgroundImageUrl = backgroundImageMapping.morning;
@@ -81,75 +78,70 @@ function updateBackgroundImage() {
         backgroundImageUrl = backgroundImageMapping.night;
     }
 
-    $('body').css('background-image', `url(${backgroundImageUrl})`);}
-
-
-
-
-async function fetchWeatherFromApi(location) {
-    let apiKey = '773d87a5a09864b76e24306a4399635d'
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`
-
-    return await getXHRPromise(url)
+    $('body').css('background-image', `url(${backgroundImageUrl})`);
 }
 
+async function fetchWeatherFromApi(location) {
+    let apiKey = '773d87a5a09864b76e24306a4399635d';
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
+
+    return await getXHRPromise(url);
+}
 
 function getXHRPromise(url) {
     return new Promise((resolve, reject) => {
-        let ajaxRequest = new XMLHttpRequest()
-        ajaxRequest.open('GET', url, true)
+        let ajaxRequest = new XMLHttpRequest();
+        ajaxRequest.open('GET', url, true);
 
-
-        ajaxRequest.timeout = 5000
-        ajaxRequest.ontimeout = () => onApiError()
+        ajaxRequest.timeout = 5000;
+        ajaxRequest.ontimeout = () => reject({ status: 408, statusText: 'Request timed out' })
 
         ajaxRequest.onreadystatechange = function() {
             if (ajaxRequest.readyState === 4) {
                 if (ajaxRequest.status === 200) {
-                    const weather = JSON.parse(ajaxRequest.responseText)
-                    resolve(weather)
-                }
-                else {
-                    reject (new Error ('Failed to load the data'))
+                    const weather = JSON.parse(ajaxRequest.responseText);
+                    resolve(weather);
+                } else {
+                    reject({ status: ajaxRequest.status, statusText: ajaxRequest.statusText })
                 }
             }
-        }
-        ajaxRequest.send()
-    })
+        };
+
+        ajaxRequest.send();
+    });
 }
 
-
-
-
 function handleResults(response) {
+    console.log('handleResults response:', response);
     if (response.cod === 200) {
-        let transformed = transform(response)
-        buildWeather(transformed)
+        let transformed = transform(response);
+        buildWeather(transformed);
     } else {
-        hideComponent('#waiting')
-        showNotFound()
+        console.log('Non-200 response code:', response.cod);
+        hideComponent('#waiting');
+        showNotFound();
     }
 }
 
 function transform(response) {
-    let camelCaseKeysResponse = camelCaseKeys(response)
-    clearNotAvailableInformation(camelCaseKeysResponse)
+    let camelCaseKeysResponse = camelCaseKeys(response);
+    clearNotAvailableInformation(camelCaseKeysResponse);
 
-    return camelCaseKeysResponse
+    return camelCaseKeysResponse;
 }
 
 function camelCaseKeys(response) {
-    return _.mapKeys(response, (v, k) => _.camelCase(k))
+    return _.mapKeys(response, (v, k) => _.camelCase(k));
 }
 
 function titleCase(str) {
-   return _.startCase(_.toLower(str));
+    return _.startCase(_.toLower(str));
 }
 
 function clearNotAvailableInformation(response) {
     for (const key in response) {
         if (response.hasOwnProperty(key) && response[key] === 'N/A') {
-            response[key] = ''
+            response[key] = '';
         }
     }
 }
@@ -166,7 +158,7 @@ function buildWeather(response) {
     const iconClass = weatherIconMapping[iconCode];
 
     if (iconClass) {
-        $('#weatherIcon').attr('class', `fas ${iconClass}`);
+        $('#weatherIcon').attr('class', `fa ${iconClass}`);
     } else {
         $('#weatherIcon').attr('src', `http://openweathermap.org/img/wn/${iconCode}@2x.png`); // Fallback to default
     }
@@ -174,48 +166,41 @@ function buildWeather(response) {
     showComponent('.weather');
 }
 
-
-
 function hideComponent(selector) {
-    $(selector).addClass('hidden')
+    $(selector).addClass('hidden');
 }
 
 function showComponent(selector) {
-    $(selector).removeClass('hidden')
+    $(selector).removeClass('hidden');
 }
 
 function showNotFound() {
-    hideComponent('#waiting')
-    hideComponent('.weather')
-    hideComponent('.error')
-    showComponent('.not-found')
+    console.log('showNotFound called');
+    hideComponent('#waiting');
+    hideComponent('.weather');
+    hideComponent('.error');
+    showComponent('.not-found');
 }
 
 function onBeforeSend() {
-    showComponent('#waiting')
-    hideComponent('.weather')
-    hideNotFound()
-    hideError()
+    showComponent('#waiting');
+    hideComponent('.weather');
+    hideNotFound();
+    hideError();
 }
 
 function onApiError() {
-    hideComponent('#waiting')
-    hideComponent('.weather')
-    hideComponent('.not-found')
-    showComponent('.error')
-}
-
-function showError() {
-    hideComponent('#waiting')
-    hideComponent('.weather')
-    hideComponent('.not-found')
-    showComponent('.error')
+    console.log('onApiError called');
+    hideComponent('#waiting');
+    hideComponent('.weather');
+    hideNotFound();
+    showComponent('.error');
 }
 
 function hideError() {
-    $('.error').addClass('hidden')
+    $('.error').addClass('hidden');
 }
 
 function hideNotFound() {
-    $('.not-found').addClass('hidden')
+    $('.not-found').addClass('hidden');
 }
