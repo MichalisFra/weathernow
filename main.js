@@ -33,6 +33,7 @@ $(function() {
         debounceTimeout = setTimeout(() => {
             getWeather(this.value.trim())
         }, 1500)
+       
     })
 
     $('#searchInput').on('keydown', function(event) {
@@ -178,10 +179,12 @@ function buildWeather(response) {
     $('#currentTime').text(new Date(response.dt * 1000).toLocaleTimeString())
     $('#temperature').text(`Temperature: ${response.main.temp}°C`)
     $('#feel').text(`Feels: ${response.main.feels_like}°C`)
-
     $('#sky').text(`Sky: ${titleCase(response.weather[0].description)}`)
     $('#humidity').text(`Humidity: ${response.main.humidity}%`)
     $('#windSpeed').text(`Wind: ${mpsToBeaufort(response.wind.speed)}B`)
+
+    showComponent('#showMore')
+
 
 
     const iconCode = response.weather[0].icon
