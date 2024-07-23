@@ -31,23 +31,49 @@ $(function() {
     $('#searchInput').on('input', function() {
         clearTimeout(debounceTimeout);
         debounceTimeout = setTimeout(() => {
-            getWeather(this.value.trim());
-        }, 1500);
-    });
+            getWeather(this.value.trim())
+        }, 1500)
+    })
 
     $('#searchInput').on('keydown', function(event) {
         if (event.key === 'Enter') {
-            event.preventDefault(); // Prevent default action, e.g., form submission
-            clearTimeout(debounceTimeout);
-            getWeather(this.value.trim());
+            event.preventDefault() // Prevent default action, e.g., form submission
+            clearTimeout(debounceTimeout)
+            getWeather(this.value.trim())
         }
-    });
+    })
 
-    updateBackgroundImage();
+    $('#showMore').on('click', function (e) {
+        e.preventDefault()
+        onShowMoreClicked.call(this)
+    })
+
+    updateBackgroundImage()
 });
 
+// function onShowMoreClicked() {
+//     $('.extended').toggleClass('hidden');
+//     $(this).text($(this).text() === 'Show More' ? 'Show Less' : 'Show More')
+//     if ($('.extended').is(!':visible')) {
+//         $('.extended').show(700)
+//     }
+// }
+
+function onShowMoreClicked() {
+    if ($('.extended').hasClass('hidden')) {
+        $('.extended').fadeIn(700).removeClass('hidden')
+        $(this).text('Show Less')
+    } else {
+        $('.extended').fadeOut(700, function() {
+            $(this).addClass('hidden')
+        })
+        $(this).text('Show More')
+    }
+}
+
+
 async function getWeather(location) {
-    if (!location) return;
+    if (!location) return
 
     try {
         onBeforeSend()
@@ -64,8 +90,8 @@ async function getWeather(location) {
 }
 
 function updateBackgroundImage() {
-    const now = new Date();
-    const hours = now.getHours();
+    const now = new Date()
+    const hours = now.getHours()
 
     let backgroundImageUrl;
     if (hours >= 6 && hours < 10) {
@@ -78,129 +104,153 @@ function updateBackgroundImage() {
         backgroundImageUrl = backgroundImageMapping.night;
     }
 
-    $('body').css('background-image', `url(${backgroundImageUrl})`);
+    $('body').css('background-image', `url(${backgroundImageUrl})`)
 }
 
 async function fetchWeatherFromApi(location) {
     let apiKey = '773d87a5a09864b76e24306a4399635d';
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`;
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`
 
     return await getXHRPromise(url);
 }
 
 function getXHRPromise(url) {
     return new Promise((resolve, reject) => {
-        let ajaxRequest = new XMLHttpRequest();
-        ajaxRequest.open('GET', url, true);
+        let ajaxRequest = new XMLHttpRequest()
+        ajaxRequest.open('GET', url, true)
 
-        ajaxRequest.timeout = 5000;
+        ajaxRequest.timeout = 5000
         ajaxRequest.ontimeout = () => reject({ status: 408, statusText: 'Request timed out' })
 
         ajaxRequest.onreadystatechange = function() {
             if (ajaxRequest.readyState === 4) {
                 if (ajaxRequest.status === 200) {
-                    const weather = JSON.parse(ajaxRequest.responseText);
-                    resolve(weather);
+                    const weather = JSON.parse(ajaxRequest.responseText)
+                    resolve(weather)
                 } else {
                     reject({ status: ajaxRequest.status, statusText: ajaxRequest.statusText })
                 }
             }
         };
 
-        ajaxRequest.send();
+        ajaxRequest.send()
     });
 }
 
 function handleResults(response) {
-    console.log('handleResults response:', response);
+    console.log('handleResults response:', response)
     if (response.cod === 200) {
-        let transformed = transform(response);
-        buildWeather(transformed);
+        let transformed = transform(response)
+        buildWeather(transformed)
     } else {
-        console.log('Non-200 response code:', response.cod);
-        hideComponent('#waiting');
-        showNotFound();
+        console.log('Non-200 response code:', response.cod)
+        hideComponent('#waiting')
+        showNotFound()
     }
 }
 
 function transform(response) {
-    let camelCaseKeysResponse = camelCaseKeys(response);
-    clearNotAvailableInformation(camelCaseKeysResponse);
+    let camelCaseKeysResponse = camelCaseKeys(response)
+    clearNotAvailableInformation(camelCaseKeysResponse)
 
-    return camelCaseKeysResponse;
+    return camelCaseKeysResponse
 }
 
 function camelCaseKeys(response) {
-    return _.mapKeys(response, (v, k) => _.camelCase(k));
+    return _.mapKeys(response, (v, k) => _.camelCase(k))
 }
 
 function titleCase(str) {
-    return _.startCase(_.toLower(str));
+    return _.startCase(_.toLower(str))
 }
 
 function clearNotAvailableInformation(response) {
     for (const key in response) {
         if (response.hasOwnProperty(key) && response[key] === 'N/A') {
-            response[key] = '';
+            response[key] = ''
         }
     }
 }
 
 function buildWeather(response) {
-    hideComponent('#waiting');
-    $('#locationName').text(response.name);
-    $('#currentTime').text(new Date(response.dt * 1000).toLocaleTimeString());
-    $('#temperature').text(`Temperature: ${response.main.temp}°C`);
-    $('#sky').text(`Sky: ${titleCase(response.weather[0].description)}`);
-    $('#humidity').text(`Humidity: ${response.main.humidity}%`);
+    hideComponent('#waiting')
+    $('#locationName').text(response.name)
+    $('#currentTime').text(new Date(response.dt * 1000).toLocaleTimeString())
+    $('#temperature').text(`Temperature: ${response.main.temp}°C`)
+    $('#feel').text(`Feels: ${response.main.feels_like}°C`)
 
-    const iconCode = response.weather[0].icon;
-    const iconClass = weatherIconMapping[iconCode];
+    $('#sky').text(`Sky: ${titleCase(response.weather[0].description)}`)
+    $('#humidity').text(`Humidity: ${response.main.humidity}%`)
+    $('#windSpeed').text(`Wind: ${mpsToBeaufort(response.wind.speed)}B`)
+
+
+    const iconCode = response.weather[0].icon
+    const iconClass = weatherIconMapping[iconCode]
 
     if (iconClass) {
-        $('#weatherIcon').attr('class', `fa ${iconClass}`);
+        $('#weatherIcon').attr('class', `fa ${iconClass}`)
     } else {
-        $('#weatherIcon').attr('src', `http://openweathermap.org/img/wn/${iconCode}@2x.png`); // Fallback to default
+        $('#weatherIcon').attr('src', `http://openweathermap.org/img/wn/${iconCode}@2x.png`) // Fallback to default
     }
 
-    showComponent('.weather');
+    showComponent('.weather')
 }
 
 function hideComponent(selector) {
-    $(selector).addClass('hidden');
+    $(selector).addClass('hidden')
 }
 
 function showComponent(selector) {
-    $(selector).removeClass('hidden');
+    $(selector).removeClass('hidden')
 }
 
 function showNotFound() {
-    console.log('showNotFound called');
-    hideComponent('#waiting');
-    hideComponent('.weather');
-    hideComponent('.error');
-    showComponent('.not-found');
+    console.log('showNotFound called')
+    hideComponent('#waiting')
+    hideComponent('.weather')
+    hideComponent('.error')
+    showComponent('.not-found')
 }
 
 function onBeforeSend() {
-    showComponent('#waiting');
-    hideComponent('.weather');
-    hideNotFound();
-    hideError();
+    showComponent('#waiting')
+    hideComponent('.weather')
+    hideNotFound()
+    hideError()
 }
 
 function onApiError() {
-    console.log('onApiError called');
-    hideComponent('#waiting');
-    hideComponent('.weather');
-    hideNotFound();
-    showComponent('.error');
+    console.log('onApiError called')
+    hideComponent('#waiting')
+    hideComponent('.weather')
+    hideNotFound()
+    showComponent('.error')
 }
 
 function hideError() {
-    $('.error').addClass('hidden');
+    $('.error').addClass('hidden')
 }
 
 function hideNotFound() {
-    $('.not-found').addClass('hidden');
+    $('.not-found').addClass('hidden')
 }
+
+function mpsToBeaufort(mps) {
+    if (mps < 0) {
+      throw new Error("Wind speed cannot be negative")
+    }
+    
+    if (mps < 0.5) return 0;
+    else if (mps < 1.5) return 1;
+    else if (mps < 3.3) return 2;
+    else if (mps < 5.5) return 3;
+    else if (mps < 7.9) return 4;
+    else if (mps < 10.7) return 5;
+    else if (mps < 13.8) return 6;
+    else if (mps < 17.1) return 7;
+    else if (mps < 20.7) return 8;
+    else if (mps < 24.4) return 9;
+    else if (mps < 28.4) return 10;
+    else if (mps < 32.6) return 11;
+    else return 12;
+  }

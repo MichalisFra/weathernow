@@ -88,7 +88,7 @@ h1 {
     margin-bottom: 15px;
 }
 
-.temperature, .sky, .humidity {
+.temperature, .sky, .humidity, .feel, .wind-speed {
     
     text-align: center; 
     font-size: 1.2rem;
@@ -149,7 +149,7 @@ input[type=text].search:focus {
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
 
-.error, .not-found {
+.error, .not-found, .show-more {
     color: white;
     text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
 
