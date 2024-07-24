@@ -237,5 +237,11 @@ input[type=text].search:focus {
     }
 
     .forecast.forecast.visible {
-    margin-left: 50px !important }
+    margin-left: 50px !important;
+    min-width: 10vw;
+     
+    }
+    .forecast-item {
+        font-size: 1rem;
+    }
 }
