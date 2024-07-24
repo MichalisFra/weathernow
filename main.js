@@ -244,7 +244,7 @@ function buildForecast(response) {
             <div class="forecast-item">
                 <div>${new Date(forecast.dt * 1000).toLocaleTimeString()}</div>
                 <i class="fas ${weatherIconMapping[forecast.weather[0].icon] || 'fa-cloud'}"></i>
-                <div>Temperature: ${forecast.main.temp}°C</div>
+                <div>Temp: ${forecast.main.temp}°C</div>
                 <div>Feels: ${forecast.main.feels_like}°C</div>
                 <div>Sky: ${titleCase(forecast.weather[0].description)}</div>
                 <div>Humidity: ${forecast.main.humidity}%</div>
