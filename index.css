@@ -225,6 +225,13 @@ input[type=text].search:focus {
 
 
 @media (max-width: 1260px) {
+
+    body {
+        height: 98.3vh;
+    }
+
+    
+
     .center {
         color: #fff;
         font-size: 28px;

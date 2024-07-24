@@ -318,41 +318,10 @@ function isMobileDevice() {
     return isMobile;
 }
 
-// Function to adjust layout and animations based on screen size
-function adjustLayoutAndAnimations() {
-    const forecastSection = document.querySelector('.forecast');
-    const weatherInfo = document.querySelector('.weather-info');
-    // const hourlyForecastItems = document.querySelectorAll('.hourly-forecast');
-
-    if (isMobileDevice()) {
-        // For mobile devices: Disable animations and adjust layout
-        document.body.classList.add('mobile');
-        forecastSection.style.transition = 'none'; // Disable transition animations
-        weatherInfo.style.transition = 'none'; // Disable transition animations for weather section
-        weatherInfo.style.transform = 'none'; // Reset any transforms
-        weatherInfo.style.margin = '0 auto'; // Center the weather section
-        forecastSection.style.margin = '0 auto'; // Center the forecast section
-        forecastSection.style.opacity = '1'; // Ensure forecast is fully visible
-    } else {
-        // For larger screens: Enable animations and normal layout
-        document.body.classList.remove('mobile');
-        forecastSection.style.transition = 'opacity 0.7s ease'; // Enable transition animations
-        weatherInfo.style.transition = ''; // Enable default transition
-        weatherInfo.style.margin = ''; // Reset margin
-        forecastSection.style.margin = ''; // Reset margin
-    }
-}
-
-// Initial layout and animation adjustment
-adjustLayoutAndAnimations();
-
-// Adjust layout and animations on window resize
-window.addEventListener('resize', adjustLayoutAndAnimations);
 
 
 function weatherSlideLeft() {
     const forecastSection = $('.forecast');
-    const showMoreLink = $('#showMore');
     const weatherSection = $('.weather');
 
     if (forecastSection.hasClass('hidden')) {
@@ -389,8 +358,7 @@ function weatherFadeIn() {
     // Show forecast section
         weather.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
 
-    // Trigger reflow
-    // forecastSection[0].offsetHeight;
+    
 
     // Allow the browser to render the change before starting the animation
     setTimeout(() => {
@@ -427,8 +395,6 @@ function fadeIn() {
     // Show forecast section
         forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
 
-    // Trigger reflow
-    // forecastSection[0].offsetHeight;
 
     // Allow the browser to render the change before starting the animation
     setTimeout(() => {
