@@ -233,8 +233,8 @@ function buildWeather(response) {
     } else {
         $('#weatherIcon').attr('src', `http://openweathermap.org/img/wn/${iconCode}@2x.png`) // Fallback to default
     }
-    weatherFadeIn();
-    
+
+    showComponent('.weather')
 }
 
 function buildForecast(response) {
@@ -375,41 +375,6 @@ function weatherSlideLeft() {
 
     }
 }
-function weatherFadeIn() {
-    const weather = $('.weather');
-
-    //skipping the first transition
-    weather.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 0);
-    weather.animate({ opacity: 0 }, 0, function() {
-        weather.removeClass('visible').addClass('hidden');
-
-    })
-
-
-    // Show forecast section
-        weather.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
-
-    // Trigger reflow
-    // forecastSection[0].offsetHeight;
-
-    // Allow the browser to render the change before starting the animation
-    setTimeout(() => {
-        weather.css('opacity', 1);
-    }, 10); // Small timeout to ensure reflow
-
-}
-
-function weatherFadeOut() {
-    const weather = $('.weather');
-
-
-    weather.animate({ opacity: 0 }, 500, function() {
-        weather.removeClass('visible').addClass('hidden');
-    
-    })
-
-}
-
 
 function fadeIn() {
     const forecastSection = $('.forecast');
@@ -436,7 +401,6 @@ function fadeIn() {
     }, 10); // Small timeout to ensure reflow
 
 }
-
 
 
 function weatherSlideRight() {
