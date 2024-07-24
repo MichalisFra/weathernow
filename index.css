@@ -1,31 +1,26 @@
-
 * {
     box-sizing: border-box;
 }
 
 body {
-	height: 95vh;
+    height: 95vh;
     width: 95vw;
     background-size: cover;
     background-repeat: no-repeat;
     margin: 0;
-
     font-family: "Roboto", sans-serif;
     font-weight: 300;
     font-style: normal;
 }
 
 h1 {
- 
     font-family: "Roboto", sans-serif;
     font-weight: 200;
     font-style: normal;
     color: #fff;
-	/* text-shadow: 2px 2px 2px rgba(0, 0, 0, 10); */
-
     text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
-
 }
+
 .container {
     text-align: center;
 }
@@ -35,28 +30,27 @@ h1 {
     min-width: 300px;
 }
 
-
 .search-form {
     position: relative;
- 
- }
-
- #waiting {
-    position: absolute;
- }
-
-.weather {
-    color: #fff;
-    font-size: 28px;
-    /* text-shadow: 1px 3px 3px black; */
-    text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
 }
 
+#waiting {
+    position: absolute;
+}
 
-
-.weather {
-    display: inline-flex;
+.center {
+    color: #fff;
+    font-size: 28px;
+    text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
     flex-wrap: wrap;
+    gap: 20px;
+}
+
+.weather, .forecast {
+    margin: 10px;
 }
 
 .weather-info {
@@ -68,13 +62,53 @@ h1 {
     padding: 20px;
     border-radius: 15px;
     width: 300px;
-	border: 1px solid rgb(148, 148, 148);
+    border: 1px solid rgb(148, 148, 148);
+    max-height: 50%; /* Adjust this percentage to scale the weather section */
+    overflow: hidden; /* Prevent overflow if content exceeds height */
+    box-sizing: border-box;
 }
 
-.weather-details {
+.forecast {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content:flex-start;
+    align-items: center; 
+    /* Center items vertically */
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 20px;
+    border: 1px solid rgb(148, 148, 148);
+    box-sizing: border-box;
+    margin: 15px;
+    margin-top: 25px;
+    min-height: 300px; 
+    /* Ensure it can fit 4 items in 2x2 grid */
+    height: auto;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.7s ease, visibility 0.7s ease; /* Ensure transition for visibility and opacity */    
+   
+    overflow: hidden;
+}
+
+.weather {
+    height: auto;
+}
+
+.weather-details, .hourly-forecast {
     display: flex;
     flex-direction: column;
-    align-items: center; /* Center child elements */
+    align-items: center;
+}
+
+.hourly-forecast {
+    border: 1px solid rgb(148, 148, 148);
+    background: rgba(255, 255, 255, 0.2);
+    padding: 10px;
+    border-radius: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 10px;
 }
 
 .text-left {
@@ -84,15 +118,28 @@ h1 {
 .location-name {
     color: #fff;
     font-size: 28px;
-
     margin-bottom: 15px;
 }
 
-.temperature, .sky, .humidity, .feel, .wind-speed {
-    
-    text-align: center; 
+.temperature, .sky, .humidity, .feel, .wind-speed, .forecast-item {
+    text-align: center;
     font-size: 1.2rem;
     margin-bottom: 10px;
+}
+
+.forecast-item {
+    background: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgb(148, 148, 148);
+    border-radius: 10px;
+    padding: 10px;
+    margin: 10px;
+    box-sizing: border-box;
+    text-align: center;
+   
+}
+
+.forecast-item > div {
+    margin: 2px;
 }
 
 .hidden {
@@ -108,9 +155,8 @@ h1 {
 }
 
 #weatherIcon {
-    font-size: 48px; /* Adjust the size as needed */
+    font-size: 48px;
     margin-bottom: 15px;
-    
 }
 
 input[type=text].search {
@@ -120,16 +166,15 @@ input[type=text].search {
     background: rgba(255, 255, 255, 0.8);
     border-radius: 25px;
     border: 1px solid #ddd;
-    padding-left: 50px; /* Ensure there's enough space for the icon */
-
+    padding-left: 50px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     font-size: 16px;
     color: #333;
     background-image: url('./img/search.png');
-    background-position: 15px center; /* Adjusted position for better visibility */
+    background-position: 15px center;
     background-repeat: no-repeat;
-    background-size: 20px 20px; /* Adjusted size to fit within the input */
+    background-size: 20px 20px;
 }
 
 input[type=text].search::placeholder {
@@ -143,8 +188,6 @@ input[type=text].search:focus {
     background-repeat: no-repeat;
     background-size: 20px 20px;
     outline: none;
-    
-    
     border-color: #007BFF;
     box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
 }
@@ -152,6 +195,47 @@ input[type=text].search:focus {
 .error, .not-found, .show-more {
     color: white;
     text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
-
 }
 
+#hourlyForecasts {
+    margin-top: 25px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+}
+
+.hourly-forecasts .hourly-forecast {
+    flex: 1 1 calc(50% - 20px); /* Adjust this value to fit 4 boxes inside the forecast */
+    max-width: calc(50% - 20px);
+    box-sizing: border-box;
+}
+
+
+
+
+.forecast.visible {
+    opacity: 1;
+    /* display: block; */
+    /* margin-left: 90px; */
+    visibility: visible;
+    transition: opacity 0.5s ease;
+}
+
+
+@media (max-width: 1260px) {
+    .center {
+        color: #fff;
+        font-size: 28px;
+        text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .forecast.forecast.visible {
+    margin-left: 50px !important }
+}

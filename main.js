@@ -21,7 +21,7 @@ const weatherIconMapping = {
 
 const backgroundImageMapping = {
     morning: "https://img.freepik.com/free-photo/twilight-cloud_1203-6585.jpg?size=626&ext=jpg&ga=GA1.1.2008272138.1721347200&semt=ais_user",
-    midday: "https://i.pinimg.com/736x/95/58/4e/95584e7488697d4d6a7567f4b86e1027.jpg",
+    midday: "https://static.vecteezy.com/system/resources/previews/001/821/201/large_2x/blue-sky-with-white-clouds-free-photo.jpg",
     afternoon: "https://images.fineartamerica.com/images-medium-large-5/afternoon-sky-joe-schofield.jpg",
     night: "https://images.rawpixel.com/image_800/czNmcy1wcml2YXRlL3Jhd3BpeGVsX2ltYWdlcy93ZWJzaXRlX2NvbnRlbnQvbHIvdXB3azYxOTE1NzQ2LXdpa2ltZWRpYS1pbWFnZS1rb3dlOGVqMy5qcGc.jpg"
 };
@@ -52,25 +52,44 @@ $(function() {
     updateBackgroundImage()
 });
 
-// function onShowMoreClicked() {
-//     $('.extended').toggleClass('hidden');
-//     $(this).text($(this).text() === 'Show More' ? 'Show Less' : 'Show More')
-//     if ($('.extended').is(!':visible')) {
-//         $('.extended').show(700)
-//     }
-// }
+
+
 
 function onShowMoreClicked() {
-    if ($('.extended').hasClass('hidden')) {
-        $('.extended').fadeIn(700).removeClass('hidden')
-        $(this).text('Show Less')
-    } else {
-        $('.extended').fadeOut(700, function() {
-            $(this).addClass('hidden')
-        })
-        $(this).text('Show More')
+    const forecastSection = $('.forecast');
+    const showMoreLink = $('#showMore');
+    const weatherSection = $('.weather');
+
+    if (!isMobileDevice()) {
+        if (forecastSection.hasClass('hidden')) {
+            weatherSlideLeft()
+            showMoreLink.text('Show Less');
+        } else {
+            weatherSlideRight()
+           
+            showMoreLink.text('Show Forecast');
+        }
+     } else {
+        console.log("on mobile");
+
+        if (forecastSection.hasClass('hidden')) {
+
+            fadeIn()
+            showMoreLink.text('Show Less');
+           
+        } else {
+            
+            fadeOut()
+            showMoreLink.text('Show Forecast');
+
+        }
     }
 }
+
+
+
+
+
 
 
 async function getWeather(location) {
@@ -78,7 +97,7 @@ async function getWeather(location) {
 
     try {
         onBeforeSend()
-        const weather = await fetchWeatherFromApi(location)
+        const weather = await fetchCoordinatesFromApi(location)
         handleResults(weather)
     } catch (error) {
         console.log(error)
@@ -108,11 +127,17 @@ function updateBackgroundImage() {
     $('body').css('background-image', `url(${backgroundImageUrl})`)
 }
 
-async function fetchWeatherFromApi(location) {
+async function fetchCoordinatesFromApi(location) {
     let apiKey = '773d87a5a09864b76e24306a4399635d';
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${apiKey}&units=metric`
 
     return await getXHRPromise(url);
+}
+
+async function fetchWeatherFromApi(lat, lon) {
+    let apiKey = '773d87a5a09864b76e24306a4399635d';
+    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+    return await getXHRPromise(url)
 }
 
 function getXHRPromise(url) {
@@ -138,15 +163,29 @@ function getXHRPromise(url) {
     });
 }
 
-function handleResults(response) {
+async function handleResults(response) {
     console.log('handleResults response:', response)
     if (response.cod === 200) {
         let transformed = transform(response)
         buildWeather(transformed)
+
+        // Make the second API call with the latitude and longitude
+        const forecast = await fetchWeatherFromApi(response.coord.lat, response.coord.lon)
+        handleForecast(forecast)
     } else {
         console.log('Non-200 response code:', response.cod)
         hideComponent('#waiting')
         showNotFound()
+    }
+}
+
+function handleForecast(response) {
+    console.log('handleForecast response:', response)
+    if (response.cod === "200") {
+        response.list = response.list.slice(0, 4)
+        buildForecast(response)
+    } else {
+        console.log('Non-200 response code:', response.cod)
     }
 }
 
@@ -184,8 +223,7 @@ function buildWeather(response) {
     $('#windSpeed').text(`Wind: ${mpsToBeaufort(response.wind.speed)}B`)
 
     showComponent('#showMore')
-
-
+    hideComponent('.forecast')
 
     const iconCode = response.weather[0].icon
     const iconClass = weatherIconMapping[iconCode]
@@ -197,6 +235,24 @@ function buildWeather(response) {
     }
 
     showComponent('.weather')
+}
+
+function buildForecast(response) {
+    let forecastsHtml = ''
+    response.list.forEach(forecast => {
+        forecastsHtml += `
+            <div class="forecast-item">
+                <div>${new Date(forecast.dt * 1000).toLocaleTimeString()}</div>
+                <i class="fas ${weatherIconMapping[forecast.weather[0].icon] || 'fa-cloud'}"></i>
+                <div>Temperature: ${forecast.main.temp}°C</div>
+                <div>Feels: ${forecast.main.feels_like}°C</div>
+                <div>Sky: ${titleCase(forecast.weather[0].description)}</div>
+                <div>Humidity: ${forecast.main.humidity}%</div>
+                <div>Wind: ${mpsToBeaufort(forecast.wind.speed)}B</div>
+            </div>
+        `
+    })
+    $('#hourlyForecasts').html(forecastsHtml)
 }
 
 function hideComponent(selector) {
@@ -239,21 +295,124 @@ function hideNotFound() {
 }
 
 function mpsToBeaufort(mps) {
-    if (mps < 0) {
-      throw new Error("Wind speed cannot be negative")
+    if (mps < 0.3) {
+        return 0;
+    } else {
+        return Math.round(Math.pow(mps / 0.836, 2/3));
     }
+}
+
+
+// Function to check if the device is a mobile device based on screen width
+function isMobileDevice() {
+    const mobileWidthThreshold = 1024; // You might want to adjust this threshold
+    const isMobile = window.innerWidth <= mobileWidthThreshold;
+    console.log("Device width:", window.innerWidth, "Mobile:", isMobile);
+    return isMobile;
+}
+
+// Function to adjust layout and animations based on screen size
+function adjustLayoutAndAnimations() {
+    const forecastSection = document.querySelector('.forecast');
+    const weatherInfo = document.querySelector('.weather-info');
+    // const hourlyForecastItems = document.querySelectorAll('.hourly-forecast');
+
+    if (isMobileDevice()) {
+        // For mobile devices: Disable animations and adjust layout
+        document.body.classList.add('mobile');
+        forecastSection.style.transition = 'none'; // Disable transition animations
+        weatherInfo.style.transition = 'none'; // Disable transition animations for weather section
+        weatherInfo.style.transform = 'none'; // Reset any transforms
+        weatherInfo.style.margin = '0 auto'; // Center the weather section
+        forecastSection.style.margin = '0 auto'; // Center the forecast section
+        forecastSection.style.opacity = '1'; // Ensure forecast is fully visible
+    } else {
+        // For larger screens: Enable animations and normal layout
+        document.body.classList.remove('mobile');
+        forecastSection.style.transition = 'opacity 0.7s ease'; // Enable transition animations
+        weatherInfo.style.transition = ''; // Enable default transition
+        weatherInfo.style.margin = ''; // Reset margin
+        forecastSection.style.margin = ''; // Reset margin
+    }
+}
+
+// Initial layout and animation adjustment
+adjustLayoutAndAnimations();
+
+// Adjust layout and animations on window resize
+window.addEventListener('resize', adjustLayoutAndAnimations);
+
+
+function weatherSlideLeft() {
+    const forecastSection = $('.forecast');
+    const showMoreLink = $('#showMore');
+    const weatherSection = $('.weather');
+
+    if (forecastSection.hasClass('hidden')) {
+           
+        //skipping the first transition
+
+        weatherSection.animate({ marginLeft: '-45px' }, 0, function() {
+            forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 0);
+        });
+        forecastSection.animate({ opacity: 0 }, 0, function() {
+            forecastSection.removeClass('visible').addClass('hidden');
+            weatherSection.animate({ marginLeft: '0px' }, 0);
+        })
+
+
+        //sliding weather left
+        weatherSection.animate({ marginLeft: '-45px' }, 400, function() {
+            forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
+        });
+
+    }
+}
+
+function fadeIn() {
+    const forecastSection = $('.forecast');
+
+
+
+    //skipping the first transition
+    forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 0);
+    forecastSection.animate({ opacity: 0 }, 0, function() {
+        forecastSection.removeClass('visible').addClass('hidden');
+
+    })
+
+
+    // Show forecast section
+        forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
+
+    // Trigger reflow
+    // forecastSection[0].offsetHeight;
+
+    // Allow the browser to render the change before starting the animation
+    setTimeout(() => {
+        forecastSection.css('opacity', 1);
+    }, 10); // Small timeout to ensure reflow
+
+}
+
+
+function weatherSlideRight() {
+    const forecastSection = $('.forecast');
+    const showMoreLink = $('#showMore');
+    const weatherSection = $('.weather');
+    // Hide the forecast first, then slide the weather section back to the center
+    forecastSection.animate({ opacity: 0 }, 500, function() {
+        forecastSection.removeClass('visible').addClass('hidden');
+        weatherSection.animate({ marginLeft: '0px' }, 400);
+    });
+}
+
+function fadeOut() {
+    const forecastSection = $('.forecast');
+
+
+    forecastSection.animate({ opacity: 0 }, 500, function() {
+        forecastSection.removeClass('visible').addClass('hidden');
     
-    if (mps < 0.5) return 0;
-    else if (mps < 1.5) return 1;
-    else if (mps < 3.3) return 2;
-    else if (mps < 5.5) return 3;
-    else if (mps < 7.9) return 4;
-    else if (mps < 10.7) return 5;
-    else if (mps < 13.8) return 6;
-    else if (mps < 17.1) return 7;
-    else if (mps < 20.7) return 8;
-    else if (mps < 24.4) return 9;
-    else if (mps < 28.4) return 10;
-    else if (mps < 32.6) return 11;
-    else return 12;
-  }
+    })
+}
