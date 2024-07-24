@@ -63,8 +63,8 @@ h1 {
     border-radius: 15px;
     width: 300px;
     border: 1px solid rgb(148, 148, 148);
-    max-height: 50%; /* Adjust this percentage to scale the weather section */
-    overflow: hidden; /* Prevent overflow if content exceeds height */
+    max-height: 50%; 
+    overflow: hidden; 
     box-sizing: border-box;
 }
 
@@ -230,6 +230,9 @@ input[type=text].search:focus {
         height: 98.3vh;
     }
 
+    .background-img {
+        height: 98.3vh !important;
+    }
     
 
     .center {
