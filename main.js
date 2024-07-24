@@ -267,6 +267,8 @@ function showNotFound() {
     console.log('showNotFound called')
     hideComponent('#waiting')
     hideComponent('.weather')
+    hideComponent('.forecast')
+    hideComponent('.show-more')
     hideComponent('.error')
     showComponent('.not-found')
 }
@@ -274,6 +276,9 @@ function showNotFound() {
 function onBeforeSend() {
     showComponent('#waiting')
     hideComponent('.weather')
+    hideComponent('.forecast')
+    hideComponent('.show-more')
+
     hideNotFound()
     hideError()
 }
@@ -282,6 +287,8 @@ function onApiError() {
     console.log('onApiError called')
     hideComponent('#waiting')
     hideComponent('.weather')
+    hideComponent('.forecast')
+    hideComponent('.show-more')
     hideNotFound()
     showComponent('.error')
 }
