@@ -84,10 +84,10 @@ h1 {
     min-height: 300px; 
     /* Ensure it can fit 4 items in 2x2 grid */
     height: auto;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.7s ease, visibility 0.7s ease; /* Ensure transition for visibility and opacity */    
-   
+    /* opacity: 0; */
+    /* visibility: hidden; */
+    /* transition: opacity 0.7s ease, visibility 0.7s ease; Ensure transition for visibility and opacity    
+    */
     overflow: hidden;
 }
 
@@ -228,6 +228,7 @@ input[type=text].search:focus {
 }
 
 
+
 @media (max-width: 1260px) {
 
     body {
@@ -244,8 +245,9 @@ input[type=text].search:focus {
         font-size: 28px;
         text-shadow: 1px 1px 2px red, 0 0 1em blue, 0 0 0.2em blue;
         display: flex;
+        /* flex-direction: column; */
         justify-content: center;
-        align-items: flex-start;
+        align-items: center;
         flex-wrap: wrap;
         gap: 20px;
     }
@@ -254,7 +256,7 @@ input[type=text].search:focus {
 
     .forecast.forecast.visible {
         margin-left: 60px !important;
-        min-width: 95vw;
+        min-width:max-content;
         display: flex;
         justify-content: space-around;
         align-items: center;

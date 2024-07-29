@@ -214,13 +214,14 @@ function clearNotAvailableInformation(response) {
 
 function buildWeather(response) {
     hideComponent('#waiting')
-    $('#locationName').text(response.name)
+    $('.location-value').text(response.name)
+    $('#countryCode').text(response.sys.country)
     $('#currentTime').text(new Date(response.dt * 1000).toLocaleTimeString())
-    $('#temperature').text(`Temperature: ${response.main.temp}°C`)
-    $('#feel').text(`Feels: ${response.main.feels_like}°C`)
-    $('#sky').text(`Sky: ${titleCase(response.weather[0].description)}`)
-    $('#humidity').text(`Humidity: ${response.main.humidity}%`)
-    $('#windSpeed').text(`Wind: ${mpsToBeaufort(response.wind.speed)}B`)
+    $('.temp-fill').text(`   ${response.main.temp}  `)
+    $('.feel-fill').text(`   ${response.main.feels_like}`)
+    $('.sky-fill').text(`  ${titleCase(response.weather[0].description)}`)
+    $('.humid-fill').text(` ${response.main.humidity}`)
+    $('.wind-fill').text(` ${mpsToBeaufort(response.wind.speed)}`)
 
     showComponent('#showMore')
     hideComponent('.forecast')
@@ -233,8 +234,8 @@ function buildWeather(response) {
     } else {
         $('#weatherIcon').attr('src', `http://openweathermap.org/img/wn/${iconCode}@2x.png`) // Fallback to default
     }
-
-    showComponent('.weather')
+    weatherFadeIn();
+    
 }
 
 function buildForecast(response) {
@@ -326,7 +327,6 @@ function adjustLayoutAndAnimations() {
 
     if (isMobileDevice()) {
         // For mobile devices: Disable animations and adjust layout
-        document.body.classList.add('mobile');
         forecastSection.style.transition = 'none'; // Disable transition animations
         weatherInfo.style.transition = 'none'; // Disable transition animations for weather section
         weatherInfo.style.transform = 'none'; // Reset any transforms
@@ -335,7 +335,6 @@ function adjustLayoutAndAnimations() {
         forecastSection.style.opacity = '1'; // Ensure forecast is fully visible
     } else {
         // For larger screens: Enable animations and normal layout
-        document.body.classList.remove('mobile');
         forecastSection.style.transition = 'opacity 0.7s ease'; // Enable transition animations
         weatherInfo.style.transition = ''; // Enable default transition
         weatherInfo.style.margin = ''; // Reset margin
@@ -350,9 +349,9 @@ adjustLayoutAndAnimations();
 window.addEventListener('resize', adjustLayoutAndAnimations);
 
 
+
 function weatherSlideLeft() {
     const forecastSection = $('.forecast');
-    const showMoreLink = $('#showMore');
     const weatherSection = $('.weather');
 
     if (forecastSection.hasClass('hidden')) {
@@ -375,6 +374,40 @@ function weatherSlideLeft() {
 
     }
 }
+function weatherFadeIn() {
+    const weather = $('.weather');
+
+    //skipping the first transition
+    weather.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 0);
+    weather.animate({ opacity: 0 }, 0, function() {
+        weather.removeClass('visible').addClass('hidden');
+
+    })
+
+
+    // Show forecast section
+        weather.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
+
+    
+
+    // Allow the browser to render the change before starting the animation
+    setTimeout(() => {
+        weather.css('opacity', 1);
+    }, 10); // Small timeout to ensure reflow
+
+}
+
+function weatherFadeOut() {
+    const weather = $('.weather');
+
+
+    weather.animate({ opacity: 0 }, 500, function() {
+        weather.removeClass('visible').addClass('hidden');
+    
+    })
+
+}
+
 
 function fadeIn() {
     const forecastSection = $('.forecast');
@@ -392,8 +425,6 @@ function fadeIn() {
     // Show forecast section
         forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
 
-    // Trigger reflow
-    // forecastSection[0].offsetHeight;
 
     // Allow the browser to render the change before starting the animation
     setTimeout(() => {
@@ -401,6 +432,7 @@ function fadeIn() {
     }, 10); // Small timeout to ensure reflow
 
 }
+
 
 
 function weatherSlideRight() {
