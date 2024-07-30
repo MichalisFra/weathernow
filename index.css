@@ -291,3 +291,67 @@ input[type=text].search:focus {
    
 }
 
+
+
+
+/* Media Query for Smartphones */
+@media (max-width: 600px) {
+    body {
+        width: 100vw;
+        height: 100vh;
+        padding: 0 10px;
+        font-size: 14px;
+    }
+
+    .center {
+        width: 100%;
+        font-size: 20px;
+    }
+
+    .panel {
+       
+        width: 85%;
+        padding: 10px;
+        font-size: 0.9rem;
+    }
+
+    #weatherIcon {
+        font-size: 5rem;
+    }
+
+    .current-time {
+        font-size: 2rem;
+    }
+
+    .weather-row {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .weather-label, .weather-value {
+        font-size: 0.9rem;
+    }
+
+    .forecast {
+        font-size: 0.9rem;
+    }
+
+    .forecast-item {
+        width: 7rem;
+    }
+
+    .forecast-row {
+        width: 7rem;
+    }
+
+    .forecast-label, .forecast-unit {
+        font-size: 0.6rem;
+    }
+
+    .forecast-value {
+        font-size: 0.8rem;
+    }
+
+    .small-gap {
+        font-size: 1rem;
+    }
+}
