@@ -60,17 +60,8 @@ function onShowMoreClicked() {
     const showMoreLink = $('#showMore');
     const weatherSection = $('.weather');
 
-    if (!isMobileDevice()) {
-        if (forecastSection.hasClass('hidden')) {
-            weatherSlideLeft()
-            showMoreLink.text('Show Less');
-        } else {
-            weatherSlideRight()
-           
-            showMoreLink.text('Show Forecast');
-        }
-     } else {
-        console.log("on mobile");
+   
+       
 
         if (forecastSection.hasClass('hidden')) {
 
@@ -83,7 +74,7 @@ function onShowMoreClicked() {
             showMoreLink.text('Show Forecast');
 
         }
-    }
+    
 }
 
 
@@ -92,22 +83,7 @@ function onShowMoreClicked() {
 
 
 
-async function getWeather(location) {
-    if (!location) return
 
-    try {
-        onBeforeSend()
-        const weather = await fetchCoordinatesFromApi(location)
-        handleResults(weather)
-    } catch (error) {
-        console.log(error)
-        if (error.status === 404) {
-            showNotFound()
-        } else {
-            onApiError()
-        }
-    }
-}
 
 function updateBackgroundImage() {
     const now = new Date()
@@ -163,31 +139,93 @@ function getXHRPromise(url) {
     });
 }
 
+function formatTimeInTimezone(timezoneOffset, date = new Date()) {
+    // Convert the local time to UTC
+    const localDate = new Date(date.getTime() + (date.getTimezoneOffset() * 60000));
+    
+    // Create a new date object for the timezone offset
+    const timezoneDate = new Date(localDate.getTime() + (timezoneOffset * 3600 * 1000));
+    
+    // Return the formatted time
+    return timezoneDate.toLocaleTimeString();
+}
+
+async function getWeather(location) {
+    if (!location) return;
+
+    try {
+        onBeforeSend();
+        const weather = await fetchCoordinatesFromApi(location);
+        handleResults(weather);
+    } catch (error) {
+        console.log(error);
+        if (error.status === 404) {
+            showNotFound();
+        } else {
+            onApiError();
+        }
+    }
+}
+
+
+
 async function handleResults(response) {
-    console.log('handleResults response:', response)
+    console.log('handleResults response:', response);
     if (response.cod === 200) {
-        let transformed = transform(response)
-        buildWeather(transformed)
+        let transformed = transform(response);
+        buildWeather(transformed);
 
         // Make the second API call with the latitude and longitude
-        const forecast = await fetchWeatherFromApi(response.coord.lat, response.coord.lon)
-        handleForecast(forecast)
+        const forecast = await fetchWeatherFromApi(response.coord.lat, response.coord.lon);
+        handleForecast(forecast);
     } else {
-        console.log('Non-200 response code:', response.cod)
-        hideComponent('#waiting')
-        showNotFound()
+        console.log('Non-200 response code:', response.cod);
+        hideComponent('#waiting');
+        showNotFound();
     }
 }
 
 function handleForecast(response) {
-    console.log('handleForecast response:', response)
+    console.log('handleForecast response:', response);
     if (response.cod === "200") {
+
         response.list = response.list.slice(0, 4)
         buildForecast(response)
+        
     } else {
-        console.log('Non-200 response code:', response.cod)
+        console.log('Non-200 response code:', response.cod);
     }
 }
+
+function buildWeather(response) {
+    hideComponent('#waiting');
+    $('.location-value').text(response.name);
+    $('#countryCode').text(response.sys.country);
+
+    // Use the timezone from the API response
+    const timezoneOffset = response.timezone / 3600; // Convert seconds to hours
+    $('#currentTime').text(formatTimeInTimezone(timezoneOffset));
+    
+    $('.temp-fill').text(`${response.main.temp}`);
+    $('.feel-fill').text(`${response.main.feels_like}`);
+    $('.sky-fill').text(`${titleCase(response.weather[0].description)}`);
+    $('.humid-fill').text(`${response.main.humidity}`);
+    $('.wind-fill').text(`${mpsToBeaufort(response.wind.speed)}`);
+
+    showComponent('#showMore');
+    hideComponent('.forecast');
+
+    const iconCode = response.weather[0].icon;
+    const iconClass = weatherIconMapping[iconCode];
+
+    if (iconClass) {
+        $('#weatherIcon').attr('class', `fa ${iconClass}`);
+    } else {
+        $('#weatherIcon').attr('src', `http://openweathermap.org/img/wn/${iconCode}@2x.png`); // Fallback to default
+    }
+    weatherFadeIn();
+}
+
 
 function transform(response) {
     let camelCaseKeysResponse = camelCaseKeys(response)
@@ -212,48 +250,72 @@ function clearNotAvailableInformation(response) {
     }
 }
 
-function buildWeather(response) {
-    hideComponent('#waiting')
-    $('#locationName').text(response.name)
-    $('#currentTime').text(new Date(response.dt * 1000).toLocaleTimeString())
-    $('#temperature').text(`Temperature: ${response.main.temp}°C`)
-    $('#feel').text(`Feels: ${response.main.feels_like}°C`)
-    $('#sky').text(`Sky: ${titleCase(response.weather[0].description)}`)
-    $('#humidity').text(`Humidity: ${response.main.humidity}%`)
-    $('#windSpeed').text(`Wind: ${mpsToBeaufort(response.wind.speed)}B`)
-
-    showComponent('#showMore')
-    hideComponent('.forecast')
-
-    const iconCode = response.weather[0].icon
-    const iconClass = weatherIconMapping[iconCode]
-
-    if (iconClass) {
-        $('#weatherIcon').attr('class', `fa ${iconClass}`)
-    } else {
-        $('#weatherIcon').attr('src', `http://openweathermap.org/img/wn/${iconCode}@2x.png`) // Fallback to default
-    }
-    weatherFadeIn();
-    
-}
-
 function buildForecast(response) {
-    let forecastsHtml = ''
+    let forecastsHtml = '';
+    const timezoneOffset = response.city.timezone / 3600; // Convert seconds to hours
+
     response.list.forEach(forecast => {
+        // Adjust the timestamp based on the timezone offset
+        const localTime = formatTimeInTimezone(timezoneOffset, new Date(forecast.dt * 1000));
+
         forecastsHtml += `
             <div class="forecast-item">
-                <div>${new Date(forecast.dt * 1000).toLocaleTimeString()}</div>
-                <i class="fas ${weatherIconMapping[forecast.weather[0].icon] || 'fa-cloud'}"></i>
-                <div>Temp: ${forecast.main.temp}°C</div>
-                <div>Feels: ${forecast.main.feels_like}°C</div>
-                <div>Sky: ${titleCase(forecast.weather[0].description)}</div>
-                <div>Humidity: ${forecast.main.humidity}%</div>
-                <div>Wind: ${mpsToBeaufort(forecast.wind.speed)}B</div>
+                <div class="small-gap">  ${localTime}</div>
+
+                
+
+                <div class="forecast-row">
+                    <div class="forecast-label"> temp: </div> 
+                    <span class="forecast-value"> ${forecast.main.temp}
+                        <span class="forecast-unit">°C</span> 
+                        </span> 
+                </div>
+
+                <div class="forecast-row">
+                    <div class="forecast-label"> feels: </div> 
+                    <span class="forecast-value"> ${forecast.main.feels_like} 
+                        <span class="forecast-unit">°C</span> 
+                        </span> 
+                </div>
+
+                <div class="forecast-row">
+                    <div class="forecast-label"> sky: </div> 
+
+                    <span class="forecast-value forecast-sky"> <i class="fas ${weatherIconMapping[forecast.weather[0].icon] || 'fa-cloud'}"></i>
+                    </span>
+                </div>
+
+                <div class="forecast-row">
+                    <div class="forecast-label"> humidity: </div>
+                     <span class="forecast-value"> ${forecast.main.humidity} 
+                        <span class="forecast-unit">%</span>
+                    </span> 
+                </div>
+
+                <div class="forecast-row">
+                    <div class="forecast-label"> wind:</div>
+                     <span class="forecast-value"> ${mpsToBeaufort(forecast.wind.speed)} <span class="forecast-unit">B</span>
+                    </span> 
+                </div>
             </div>
-        `
-    })
-    $('#hourlyForecasts').html(forecastsHtml)
+        `;
+    });
+
+    $('#hourlyForecasts').html(forecastsHtml);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function hideComponent(selector) {
     $(selector).addClass('hidden')
@@ -310,69 +372,35 @@ function mpsToBeaufort(mps) {
 }
 
 
-// Function to check if the device is a mobile device based on screen width
-function isMobileDevice() {
-    const mobileWidthThreshold = 1024; // You might want to adjust this threshold
-    const isMobile = window.innerWidth <= mobileWidthThreshold;
-    console.log("Device width:", window.innerWidth, "Mobile:", isMobile);
-    return isMobile;
-}
-
-// Function to adjust layout and animations based on screen size
-function adjustLayoutAndAnimations() {
-    const forecastSection = document.querySelector('.forecast');
-    const weatherInfo = document.querySelector('.weather-info');
-    // const hourlyForecastItems = document.querySelectorAll('.hourly-forecast');
-
-    if (isMobileDevice()) {
-        // For mobile devices: Disable animations and adjust layout
-        forecastSection.style.transition = 'none'; // Disable transition animations
-        weatherInfo.style.transition = 'none'; // Disable transition animations for weather section
-        weatherInfo.style.transform = 'none'; // Reset any transforms
-        weatherInfo.style.margin = '0 auto'; // Center the weather section
-        forecastSection.style.margin = '0 auto'; // Center the forecast section
-        forecastSection.style.opacity = '1'; // Ensure forecast is fully visible
-    } else {
-        // For larger screens: Enable animations and normal layout
-        forecastSection.style.transition = 'opacity 0.7s ease'; // Enable transition animations
-        weatherInfo.style.transition = ''; // Enable default transition
-        weatherInfo.style.margin = ''; // Reset margin
-        forecastSection.style.margin = ''; // Reset margin
-    }
-}
-
-// Initial layout and animation adjustment
-adjustLayoutAndAnimations();
-
-// Adjust layout and animations on window resize
-window.addEventListener('resize', adjustLayoutAndAnimations);
 
 
 
-function weatherSlideLeft() {
-    const forecastSection = $('.forecast');
-    const weatherSection = $('.weather');
+// function weatherSlideLeft() {
+//     const forecastSection = $('.forecast');
+//     const weatherSection = $('.weather');
 
-    if (forecastSection.hasClass('hidden')) {
+//     if (forecastSection.hasClass('hidden')) {
            
-        //skipping the first transition
+//         //skipping the first transition
 
-        weatherSection.animate({ marginLeft: '-45px' }, 0, function() {
-            forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 0);
-        });
-        forecastSection.animate({ opacity: 0 }, 0, function() {
-            forecastSection.removeClass('visible').addClass('hidden');
-            weatherSection.animate({ marginLeft: '0px' }, 0);
-        })
+//         weatherSection.animate({ marginLeft: '-45px' }, 0, function() {
+//             forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 0);
+//         });
+//         forecastSection.animate({ opacity: 0 }, 0, function() {
+//             forecastSection.removeClass('visible').addClass('hidden');
+//             weatherSection.animate({ marginLeft: '0px' }, 0);
+//         })
 
 
-        //sliding weather left
-        weatherSection.animate({ marginLeft: '-45px' }, 400, function() {
-            forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
-        });
+//         //sliding weather left
+//         weatherSection.animate({ marginLeft: '-45px' }, 400, function() {
+//             forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
+//         });
 
-    }
-}
+//     }
+// }
+
+
 function weatherFadeIn() {
     const weather = $('.weather');
 
@@ -434,16 +462,16 @@ function fadeIn() {
 
 
 
-function weatherSlideRight() {
-    const forecastSection = $('.forecast');
-    const showMoreLink = $('#showMore');
-    const weatherSection = $('.weather');
-    // Hide the forecast first, then slide the weather section back to the center
-    forecastSection.animate({ opacity: 0 }, 500, function() {
-        forecastSection.removeClass('visible').addClass('hidden');
-        weatherSection.animate({ marginLeft: '0px' }, 400);
-    });
-}
+// function weatherSlideRight() {
+//     const forecastSection = $('.forecast');
+//     const showMoreLink = $('#showMore');
+//     const weatherSection = $('.weather');
+//     // Hide the forecast first, then slide the weather section back to the center
+//     forecastSection.animate({ opacity: 0 }, 500, function() {
+//         forecastSection.removeClass('visible').addClass('hidden');
+//         weatherSection.animate({ marginLeft: '0px' }, 400);
+//     });
+// }
 
 function fadeOut() {
     const forecastSection = $('.forecast');
@@ -454,3 +482,4 @@ function fadeOut() {
     
     })
 }
+
