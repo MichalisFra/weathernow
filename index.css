@@ -236,6 +236,10 @@ input[type=text].search:focus {
 
     border-right: 1px solid white;
 }
+
+.forecast-item:first-child {
+    margin-left: 8px;
+}
 .forecast-item:last-child {
     border-right: none;
 }
