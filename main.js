@@ -49,6 +49,11 @@ $(function() {
         onShowMoreClicked.call(this)
     })
 
+    $('#btn').on('click', function (e) {
+        e.preventDefault()
+        onBtnClicked()
+    })
+
     updateBackgroundImage()
 });
 
@@ -223,6 +228,9 @@ function buildWeather(response) {
     } else {
         $('#weatherIcon').attr('src', `http://openweathermap.org/img/wn/${iconCode}@2x.png`); // Fallback to default
     }
+
+    adjustSkyFontSize();
+
     weatherFadeIn();
 }
 
@@ -305,7 +313,21 @@ function buildForecast(response) {
 }
 
 
+function adjustSkyFontSize() {
+    if ($(window).width() <= 600) {
+        if ($('.sky-fill').text().length > 10) {
+            $('.sky-fill').css('font-size' , 0.7 + 'rem')
+        } else {
+            $('.sky-fill').css('font-size' , 0.9 + 'rem')
 
+        }
+    }
+}
+
+function onBtnClicked() {
+    $('.hourly-forecasts').toggle()
+    $('.weekly-forecasts').toggle()
+}
 
 
 

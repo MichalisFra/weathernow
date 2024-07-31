@@ -144,22 +144,8 @@ input[type=text].search:focus {
 
 }
 
-/* .weather-row {
-    display: flex;
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 15px; 
-   
-} */
-
-
-/* .weather-label {
-    font-size: 1rem; 
-    color: #333; 
-    min-width: max-content;
-    text-align: center;
-   
-    
+/* .weekly-forecasts {
+    display: none;
 } */
 
 
@@ -306,10 +292,14 @@ input[type=text].search:focus {
     .center {
         width: 100%;
         font-size: 20px;
+        display: flex;
+      
+        align-content: center;
     }
 
     .panel {
-       
+       margin-left: auto;
+       margin-right: auto;
         width: 85%;
         padding: 10px;
         font-size: 0.9rem;
@@ -327,7 +317,10 @@ input[type=text].search:focus {
         grid-template-columns: 1fr 1fr;
     }
 
-    .weather-label, .weather-value {
+    .weather-label, .weather-unit {
+        font-size: 0.7rem;
+    }
+    .weather-value {
         font-size: 0.9rem;
     }
 
@@ -353,5 +346,17 @@ input[type=text].search:focus {
 
     .small-gap {
         font-size: 1rem;
+        margin-left: 0px;
+
     }
+
+    .forecast-item:last-of-type .small-gap {
+        margin-right: 10px;
+    }
+    .forecast-item:first-of-type {
+        margin-left: 0.9rem;
+    }
+
+    
+
 }
