@@ -63,22 +63,17 @@ $(function() {
 function onShowMoreClicked() {
     const forecastSection = $('.forecast');
     const showMoreLink = $('#showMore');
-    const weatherSection = $('.weather');
-
    
-       
+    if( forecastSection.is(':visible') ) {
+        showMoreLink.text('Show Forecast');
 
-        if (forecastSection.hasClass('hidden')) {
+    } else {
+        showMoreLink.text('Show Less');
 
-            fadeIn()
-            showMoreLink.text('Show Less');
-           
-        } else {
-            
-            fadeOut()
-            showMoreLink.text('Show Forecast');
 
-        }
+    }
+
+    fadeForecast()
     
 }
 
@@ -231,7 +226,7 @@ function buildWeather(response) {
 
     adjustSkyFontSize();
 
-    weatherFadeIn();
+    weatherFadeInAndOut();
 }
 
 
@@ -397,111 +392,32 @@ function mpsToBeaufort(mps) {
 
 
 
-// function weatherSlideLeft() {
-//     const forecastSection = $('.forecast');
-//     const weatherSection = $('.weather');
 
-//     if (forecastSection.hasClass('hidden')) {
-           
-//         //skipping the first transition
+function weatherFadeInAndOut() {
+    const weather = $('.weather')
 
-//         weatherSection.animate({ marginLeft: '-45px' }, 0, function() {
-//             forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 0);
-//         });
-//         forecastSection.animate({ opacity: 0 }, 0, function() {
-//             forecastSection.removeClass('visible').addClass('hidden');
-//             weatherSection.animate({ marginLeft: '0px' }, 0);
-//         })
+    weather.hide(400, "linear")
+    weather.show(700)
 
-
-//         //sliding weather left
-//         weatherSection.animate({ marginLeft: '-45px' }, 400, function() {
-//             forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
-//         });
-
-//     }
-// }
-
-
-function weatherFadeIn() {
-    const weather = $('.weather');
-
-    //skipping the first transition
-    weather.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 0);
-    weather.animate({ opacity: 0 }, 0, function() {
-        weather.removeClass('visible').addClass('hidden');
-
-    })
-
-
-    // Show forecast section
-        weather.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
-
-    
-
-    // Allow the browser to render the change before starting the animation
-    setTimeout(() => {
-        weather.css('opacity', 1);
-    }, 10); // Small timeout to ensure reflow
-
-}
-
-function weatherFadeOut() {
-    const weather = $('.weather');
-
-
-    weather.animate({ opacity: 0 }, 500, function() {
-        weather.removeClass('visible').addClass('hidden');
-    
-    })
-
-}
-
-
-function fadeIn() {
-    const forecastSection = $('.forecast');
-
-
-
-    //skipping the first transition
-    forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 0);
-    forecastSection.animate({ opacity: 0 }, 0, function() {
-        forecastSection.removeClass('visible').addClass('hidden');
-
-    })
-
-
-    // Show forecast section
-        forecastSection.removeClass('hidden').addClass('visible').animate({ opacity: 1 }, 500);
-
-
-    // Allow the browser to render the change before starting the animation
-    setTimeout(() => {
-        forecastSection.css('opacity', 1);
-    }, 10); // Small timeout to ensure reflow
 
 }
 
 
 
-// function weatherSlideRight() {
-//     const forecastSection = $('.forecast');
-//     const showMoreLink = $('#showMore');
-//     const weatherSection = $('.weather');
-//     // Hide the forecast first, then slide the weather section back to the center
-//     forecastSection.animate({ opacity: 0 }, 500, function() {
-//         forecastSection.removeClass('visible').addClass('hidden');
-//         weatherSection.animate({ marginLeft: '0px' }, 400);
-//     });
-// }
 
-function fadeOut() {
-    const forecastSection = $('.forecast');
+function fadeForecast() {
+    const forecastSection = $('.forecast')
+    if (forecastSection.is(':visible')) {
+        forecastSection.hide(700)
+    } else {
+        forecastSection.show(700)
+    }
 
-
-    forecastSection.animate({ opacity: 0 }, 500, function() {
-        forecastSection.removeClass('visible').addClass('hidden');
-    
-    })
 }
+
+
+
+
+
+
 
