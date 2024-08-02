@@ -226,7 +226,7 @@ function buildWeather(response) {
 
     adjustSkyFontSize();
 
-    weatherFadeInAndOut();
+    showWeather()
 }
 
 
@@ -345,8 +345,8 @@ function showComponent(selector) {
 function showNotFound() {
     console.log('showNotFound called')
     hideComponent('#waiting')
-    hideComponent('.weather')
-    hideComponent('.forecast')
+    weatherFadeInAndOut()
+    fadeForecast()
     hideComponent('.show-more')
     hideComponent('.error')
     showComponent('.not-found')
@@ -365,7 +365,8 @@ function onBeforeSend() {
 function onApiError() {
     console.log('onApiError called')
     hideComponent('#waiting')
-    hideComponent('.weather')
+    weatherFadeInAndOut()
+    fadeForecast()
     hideComponent('.forecast')
     hideComponent('.show-more')
     hideNotFound()
@@ -389,16 +390,22 @@ function mpsToBeaufort(mps) {
 }
 
 
-
-
-
+function showWeather() {
+  
+    const weather = $('.weather')
+    weather.hide(700)
+    weather.show(700)
+  
+}
 
 function weatherFadeInAndOut() {
     const weather = $('.weather')
 
-    weather.hide(400, "linear")
-    weather.show(700)
-
+    if (weather.is(':visible')) {
+        weather.hide(700)
+    } else {
+        weather.show(700)
+    }
 
 }
 

@@ -191,8 +191,11 @@ input[type=text].search:focus {
 
 .weather-label {
     font-size: 1rem; 
-    color: #333; 
+    font-weight: 400;
+    color: #2b2b2b;
     text-align: right; 
+     
+
 
     width: 65px;
 }
@@ -208,9 +211,7 @@ input[type=text].search:focus {
    text-wrap: nowrap;
 }
 
-.hidden {
-    display: none;
-}
+
 
 .forecast {
     font-size: 1rem;
@@ -251,6 +252,7 @@ input[type=text].search:focus {
     text-align: left;
     /* text-shadow: 1px 2px 2px red, 0 0 1em blue, 0 0 0.2em blue; */
     font-weight: 400;
+    
 
    
     
@@ -258,10 +260,14 @@ input[type=text].search:focus {
 
 .forecast-label {
     width: 2.4rem;
+    font-weight: 400;
     /* margin-top: 2px; */
     text-align: right;
     /* vertical-align: super; */
-    color: #333; 
+    color: #111111;
+
+   
+
 }
 
 
@@ -278,7 +284,9 @@ input[type=text].search:focus {
 }
 
 
-
+.hidden {
+    display: none;
+}
 
 
 /* Media Query for Smartphones */
