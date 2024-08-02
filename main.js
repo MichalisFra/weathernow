@@ -174,9 +174,11 @@ async function handleResults(response) {
     if (response.cod === 200) {
         let transformed = transform(response);
         buildWeather(transformed);
+        
 
         // Make the second API call with the latitude and longitude
         const forecast = await fetchWeatherFromApi(response.coord.lat, response.coord.lon);
+        
         handleForecast(forecast);
     } else {
         console.log('Non-200 response code:', response.cod);
@@ -189,18 +191,23 @@ function handleForecast(response) {
     console.log('handleForecast response:', response);
     if (response.cod === "200") {
 
-        response.list = response.list.slice(0, 4)
+        response.list = response.list.slice(0, 5)
         buildForecast(response)
         
     } else {
         console.log('Non-200 response code:', response.cod);
     }
 }
+////////
+let currentDt
 
 function buildWeather(response) {
     hideComponent('#waiting');
     $('.location-value').text(response.name);
     $('#countryCode').text(response.sys.country);
+
+    //////
+    currentDt = response.dt;
 
     // Use the timezone from the API response
     const timezoneOffset = response.timezone / 3600; // Convert seconds to hours
@@ -257,7 +264,14 @@ function buildForecast(response) {
     let forecastsHtml = '';
     const timezoneOffset = response.city.timezone / 3600; // Convert seconds to hours
 
-    response.list.forEach(forecast => {
+    const forecastFirstDt = response.list[0].dt
+    let dtDif = (forecastFirstDt - currentDt)/3600 > 1.1
+    let slice = dtDif ? response.list.slice(0,4) : response.list.slice(1,5)
+
+    console.log(dtDif, slice)
+
+
+    slice.forEach(forecast => {
         // Adjust the timestamp based on the timezone offset
         const localTime = formatTimeInTimezone(timezoneOffset, new Date(forecast.dt * 1000));
 

@@ -265,7 +265,7 @@ function buildForecast(response) {
     const timezoneOffset = response.city.timezone / 3600; // Convert seconds to hours
 
     const forecastFirstDt = response.list[0].dt
-    let dtDif = (forecastFirstDt - currentDt)/3600 > 1.5
+    let dtDif = (forecastFirstDt - currentDt)/3600 > 1.1
     let slice = dtDif ? response.list.slice(0,4) : response.list.slice(1,5)
 
     console.log(dtDif, slice)
