@@ -345,7 +345,7 @@ function showComponent(selector) {
 function showNotFound() {
     console.log('showNotFound called')
     hideComponent('#waiting')
-    weatherFadeInAndOut()
+    hideWeather()
     fadeForecast()
     hideComponent('.show-more')
     hideComponent('.error')
@@ -365,7 +365,7 @@ function onBeforeSend() {
 function onApiError() {
     console.log('onApiError called')
     hideComponent('#waiting')
-    weatherFadeInAndOut()
+    hideWeather()
     fadeForecast()
     hideComponent('.forecast')
     hideComponent('.show-more')
@@ -398,16 +398,20 @@ function showWeather() {
   
 }
 
-function weatherFadeInAndOut() {
-    const weather = $('.weather')
-
-    if (weather.is(':visible')) {
-        weather.hide(700)
-    } else {
-        weather.show(700)
-    }
-
+function hideWeather() {
+    $('.weather').hide(450)
 }
+
+// function weatherFadeInAndOut() {
+//     const weather = $('.weather')
+
+//     if (weather.is(':visible')) {
+//         weather.hide(700)
+//     } else {
+//         weather.show(700)
+//     }
+
+// }
 
 
 
