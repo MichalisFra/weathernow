@@ -191,7 +191,7 @@ function handleForecast(response) {
     console.log('handleForecast response:', response);
     if (response.cod === "200") {
 
-        response.list = response.list.slice(0, 5)
+        // response.list = response.list.slice(0, 5)
         buildForecast(response)
         
     } else {
@@ -319,6 +319,61 @@ function buildForecast(response) {
     });
 
     $('#hourlyForecasts').html(forecastsHtml);
+
+
+
+    ///weekly
+    let weeklyForecast = ''
+
+    const specificIndices = [9, 17, 25, 33];
+
+    specificIndices.forEach(index => {
+        if (index < response.list.length) {
+            const forecast = response.list[index];
+            const localTime = formatTimeInTimezone(timezoneOffset, new Date(forecast.dt * 1000));
+
+            weeklyForecast += `
+                <div class="forecast-item">
+                    <div class="small-gap"> ${forecast.dt_txt.slice(0,10)}</div>
+                    <div class="forecast-row">
+                        <div class="forecast-label"> temp: </div> 
+                        <span class="forecast-value"> ${forecast.main.temp}
+                            <span class="forecast-unit">°C</span> 
+                        </span> 
+                    </div>
+                    <div class="forecast-row">
+                        <div class="forecast-label"> feels: </div> 
+                        <span class="forecast-value"> ${forecast.main.feels_like} 
+                            <span class="forecast-unit">°C</span> 
+                        </span> 
+                    </div>
+                    <div class="forecast-row">
+                        <div class="forecast-label"> sky: </div> 
+                        <span class="forecast-value forecast-sky"> 
+                            <i class="fas ${weatherIconMapping[forecast.weather[0].icon] || 'fa-cloud'}"></i>
+                        </span>
+                    </div>
+                    <div class="forecast-row">
+                        <div class="forecast-label"> humidity: </div>
+                        <span class="forecast-value"> ${forecast.main.humidity} 
+                            <span class="forecast-unit">%</span>
+                        </span> 
+                    </div>
+                    <div class="forecast-row">
+                        <div class="forecast-label"> wind:</div>
+                        <span class="forecast-value"> ${mpsToBeaufort(forecast.wind.speed)} 
+                            <span class="forecast-unit">B</span>
+                        </span> 
+                    </div>
+                </div>
+            `;
+        }
+    });
+    $('#weeklyForecasts').html(weeklyForecast);
+    $('#weeklyForecasts').hide()
+
+
+
 }
 
 
@@ -334,8 +389,20 @@ function adjustSkyFontSize() {
 }
 
 function onBtnClicked() {
-    $('.hourly-forecasts').toggle()
-    $('.weekly-forecasts').toggle()
+    if ($('.hourly-forecasts').is(':visible')) {
+        $('.btn').text('Weekly Forecast')
+        $('.hourly-forecasts').hide(600)
+        $('.weekly-forecasts').show(600)
+
+    } else {
+        $('.btn').text('Hourly Forecast')
+
+        $('.weekly-forecasts').hide(600)
+        $('.hourly-forecasts').show(600)
+
+    }
+    
+    // $('.weekly-forecasts').toggle()
 }
 
 
