@@ -391,8 +391,8 @@ function adjustSkyFontSize() {
 function btnBeforeSend() {
     $('.btn').text('Hourly Forecast')
 
-    $('.weekly-forecasts').hide(600)
-    $('.hourly-forecasts').show(600)
+    $('.weekly-forecasts').hide()
+    $('.hourly-forecasts').show()
 }
 function onBtnClicked() {
 
@@ -442,12 +442,12 @@ function showNotFound() {
 
 function onBeforeSend() {
     showComponent('#waiting')
-    btnBeforeSend()
+    
 
     hideComponent('.weather')
     hideComponent('.forecast')
     hideComponent('.show-more')
-
+    btnBeforeSend()
     hideNotFound()
     hideError()
 }
