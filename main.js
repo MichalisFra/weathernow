@@ -388,8 +388,15 @@ function adjustSkyFontSize() {
     }
 }
 
+function btnBeforeSend() {
+    $('.btn').text('Hourly Forecast')
+
+    $('.weekly-forecasts').hide(600)
+    $('.hourly-forecasts').show(600)
+}
 function onBtnClicked() {
-    if ($('.hourly-forecasts').is(':visible')) {
+
+    if  ($('.hourly-forecasts').is(':visible')) {
         $('.btn').text('Weekly Forecast')
         $('.hourly-forecasts').hide(600)
         $('.weekly-forecasts').show(600)
@@ -435,6 +442,8 @@ function showNotFound() {
 
 function onBeforeSend() {
     showComponent('#waiting')
+    btnBeforeSend()
+
     hideComponent('.weather')
     hideComponent('.forecast')
     hideComponent('.show-more')
